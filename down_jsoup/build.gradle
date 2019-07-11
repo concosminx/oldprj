@@ -1,4 +1,8 @@
 apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'application'
+
+mainClassName = "crc.jsoup.main.JsoupDownloader"
 
 sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -11,22 +15,24 @@ sourceCompatibility = '1.8'
 // prefer. In this case NetBeans will not add these tasks but you may rely on
 // your own implementation.
 if (!hasProperty('mainClass')) {
-  ext.mainClass = ''
+    ext.mainClass = ''
 }
 
 repositories {
-  mavenCentral()
-  // You may define additional repositories, or even remove "mavenCentral()".
-  // Read more about repositories here:
-  //   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:repositories
+    mavenCentral()
+    // You may define additional repositories, or even remove "mavenCentral()".
+    // Read more about repositories here:
+    //   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:repositories
 }
 
 dependencies {
-  // TODO: Add dependencies here ...
-  // You can read more about how to add dependency here:
-  //   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:how_to_declare_your_dependencies
-  compile group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
-  compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.26'
-  compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.26'
-
+    // TODO: Add dependencies here ...
+    // You can read more about how to add dependency here:
+    //   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:how_to_declare_your_dependencies
+    testCompile group: 'junit', name: 'junit', version: '4.10'
+    compile ("org.jsoup:jsoup:1.8.1")
+    compile ("org.slf4j:slf4j-api:1.6.4")
+    compile ("ch.qos.logback:logback-classic:1.0.1")
+    compile ("ch.qos.logback:logback-core:1.0.1")
+    compile group: 'com.google.guava', name: 'guava', version: '23.6-jre'
 }
