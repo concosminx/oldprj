@@ -1,11 +1,17 @@
-package com.nimsoc.jsoup;
+package crc.jsoup.service.impl;
 
+import crc.jsoup.service.JsoupEngine;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -13,42 +19,55 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JsoupDownloaderGoodFon {
+/**
+ *
+ * @author cosmin.i
+ */
+public class GoodFonJsoupEngineImpl implements JsoupEngine {
 
-  private static final int MAX_PAGE_NUMBER = 1;
+  private static final Logger LOG = LoggerFactory.getLogger(GoodFonJsoupEngineImpl.class);
+
   private static final String USER_AGENT = "Mozilla";
-  private static final int MAX_COUNT = 5;
-  private static final String QUERY_PAGE = "http://www.some_site.com/search/?";
-  private static final String QUERY_CONTENT = "some_search";
+  private static final int CONNECTION_TIMEOUT = 10000;
+  private JsoupConfig cfg = null;
+  private String queryContent = "";
+  private final StringBuilder stats = new StringBuilder();
+  private final static String LS = "\n";
 
-  private static final Logger LOG = LoggerFactory.getLogger(JsoupDownloaderGoodFon.class);
-
-  public static void main(String[] args) throws IOException {
-    SimpleDateFormat sdf = new SimpleDateFormat("dd_MM_yyyy");
-    String user_home = System.getProperty("user.home");
-
-    File f = new File(user_home + File.pathSeparator + sdf.format(new java.util.Date()));
-    if (!f.exists()) {
-      f.mkdirs();
+  @Override
+  public void initEngine(JsoupConfig _cfg) {
+    this.cfg = _cfg;
+    if (!cfg.getDownloadDir().exists()) {
+      cfg.getDownloadDir().mkdirs();
     }
+    stats.setLength(0);
+    stats.append("Initialization ended at ").append(new Date()).append(LS);
+  }
 
-    LOG.info("computed download folder: " + f.getAbsolutePath());
+  @Override
+  public JsoupConfig getCfg() {
+    return cfg;
+  }
 
-    //downloaded images counter
-    AtomicInteger c = new AtomicInteger(0);
-
-    for (int i = 0; i < MAX_PAGE_NUMBER; i++) {
-      String page = "";
-      try {
-        page = QUERY_PAGE + (i == 0 ? "" : ("p=" + (i + 1))) + (i == 0 ? "" : "&") + "q=" + QUERY_CONTENT;
-        downloadCatalogPage(f, page, c);
-      } catch (IOException exc) {
-        LOG.error("Error on download catalog " + page, exc);
-      }
+  @Override
+  public void setCfg(JsoupConfig cfg) {
+    this.cfg = cfg;
+    if (!this.cfg.getDownloadDir().exists()) {
+      this.cfg.getDownloadDir().mkdirs();
     }
   }
 
-  private static void downloadCatalogPage(File f, String url, AtomicInteger counter) throws IOException {
+  @Override
+  public String getQueryContent() {
+    return queryContent;
+  }
+
+  @Override
+  public void setQueryContent(String queryContent) {
+    this.queryContent = queryContent;
+  }
+
+  private void downloadCatalogPage(File f, String url, AtomicInteger counter) throws IOException {
     LOG.info("catalog page url: " + url);
 
     //root catalog page connection
@@ -68,7 +87,7 @@ public class JsoupDownloaderGoodFon {
 
     //iterate accepted links
     for (String imgLink : imgLinks) {
-      if (counter.get() >= MAX_COUNT) {
+      if (counter.get() >= this.getCfg().getMaxCount()) {
         break;
       }
 
@@ -117,6 +136,35 @@ public class JsoupDownloaderGoodFon {
 
   private static boolean acceptLevel1Link(String href) {
     return href != null && href.contains(".html") && !href.contains("index");
+  }
+
+  @Override
+  public void startDownload(String _queryContent) {
+    setQueryContent(_queryContent);
+    AtomicInteger counter = new AtomicInteger(0);
+    for (int i = 0; i < cfg.getMaxPage(); i++) {
+      String page = "";
+      try {
+        page = cfg.getQueryPage() + ("?q=" + queryContent) + (i == 0 ? "" : "&") + (i == 0 ? "" : ("page=" + (i + 1)));
+        downloadCatalogPage(this.getCfg().getDownloadDir(), page, counter);
+      } catch (IOException exc) {
+        LOG.error("Error on download catalog " + page, exc);
+      }
+    }
+    stats.append("Download ended at ").append(new Date()).append("; number of files downloaded: ").append(counter.get()).append(LS);
+  }
+
+  private String getFileNameFromLink(String href) {
+    String fileName = "nope.txt";
+    if (href != null) {
+      fileName = href.substring(href.lastIndexOf('/') + 1);
+    }
+    return fileName;
+  }
+
+  @Override
+  public String getStatistics() {
+    return stats.toString();
   }
 
 }

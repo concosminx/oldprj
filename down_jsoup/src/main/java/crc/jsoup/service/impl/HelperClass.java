@@ -1,4 +1,4 @@
-package com.nimsoc.jsoup;
+package crc.jsoup.service.impl;
 
 import java.io.File;
 import java.io.FileOutputStream;
