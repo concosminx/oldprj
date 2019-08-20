@@ -1,0 +1,17 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+
+/*
+  @see: https://www.javacodegeeks.com/2012/10/investigating-deadlocks-part-1.html
+        https://www.javacodegeeks.com/2012/10/investigating-deadlocks-part-2.html
+        https://www.javacodegeeks.com/2012/11/investigating-deadlocks-part-3.html
+        https://www.javacodegeeks.com/2012/11/investigating-deadlocks-part-4-fixing-the-code.html
+        https://www.javacodegeeks.com/2012/11/investigating-deadlocks-part-5-using-explicit-locking.html
+*/
+
+mainClassName = 'deadlock.sample.DeadlockDemo'
+
+repositories {
+    jcenter()
+}
