@@ -1,0 +1,15 @@
+apply plugin: 'java'
+apply plugin: 'jacoco'
+apply plugin: 'application'
+
+
+mainClassName = 'com.nimsoc.mail.MainApp'
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile group: 'javax.mail', name: 'javax.mail-api', version: '1.6.2'
+  compile group: 'com.sun.mail', name: 'javax.mail', version: '1.6.2'
+}

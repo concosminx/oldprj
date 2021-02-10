@@ -1,5 +1,18 @@
-/mp3rename/build/
-/callable-sample/.gradle/
-/callable-sample/build/
-/fork-sample/.gradle/
-/fork-sample/build/
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.classpath
+.svn/
+
+*.iml
+*.ipr
+*.iws
+.idea/
+.gradle/
+build/
